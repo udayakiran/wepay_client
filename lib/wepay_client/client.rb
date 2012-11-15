@@ -87,10 +87,9 @@ module WepayClient
       http.use_ssl = use_ssl
 
       # construct the call data and access token
-      req = Net::HTTP.const_get(type.to_s.camelize).new(uri.request_uri)
+      req = Net::HTTP.const_get(type.to_s.camelize).new(uri.request_uri, initheader = {'Content-Type' =>'application/json', 'User-Agent' => 'WePay Ruby SDK'})
       req.add_field('Authorization: Bearer', access_token) if access_token
       req.body = body.to_json if body
-
       http.request(req)
     end
 
@@ -108,7 +107,7 @@ module WepayClient
         raise e if e.class.to_s =~ /WepayClient/
         raise WepayClient::Exceptions::WepayApiError.new("There was an error while trying to connect with WePay - #{e.inspect}")
       end
-      if response.success?
+      if response.kind_of?(Net::HTTPSuccess)
         return json
       elsif response.code == 401
         raise WepayClient::Exceptions::ExpiredTokenError.new("Token either expired, revoked or invalid: #{json.inspect}.")
