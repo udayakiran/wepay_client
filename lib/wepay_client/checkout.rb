@@ -13,7 +13,7 @@ module WepayClient
           :auto_capture => 1,
           :require_shipping => 0
       }.merge(params)
-      self.post("/checkout/create", access_token, defaults)
+      self.post("/checkout/create", access_token, defaults.merge(params))
     end
 
     def refund(access_token, checkout_id, params = {})
