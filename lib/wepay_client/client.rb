@@ -19,6 +19,13 @@ module WepayClient
     CLIENT_ID              = '123456'
     CLIENT_SECRET          = '123456'
 
+    attr_reader :api_endpoint, :ui_endpoint
+
+    def initialize()
+      @api_endpoint = PRODUCTION_API_ENDPOINT
+      @ui_endpoint  = PRODUCTION_UI_ENDPOINT
+    end
+
     def self.configure(&blk)
       self.instance.configure &blk
     end
@@ -28,30 +35,19 @@ module WepayClient
       instance_eval &blk
     end
 
-    def api_endpoint
-      if @use_stage
-        STAGE_API_ENDPOINT
+    def use_stage(_use_stage)
+      if _use_stage
+        @api_endpoint = STAGE_API_ENDPOINT
+        @ui_endpoint  = STAGE_UI_ENDPOINT
       else
-        PRODUCTION_API_ENDPOINT
+        @api_endpoint = PRODUCTION_API_ENDPOINT
+        @ui_endpoint  = PRODUCTION_UI_ENDPOINT
       end
-    end
-
-    def ui_endpoint
-      if @use_stage
-        STAGE_UI_ENDPOINT
-      else
-        PRODUCTION_UI_ENDPOINT
-      end
-    end
-
-    def use_stage(_use_stage = nil)
-      @use_stage = _use_stage if _use_stage
-      @use_stage
     end
 
     def use_ssl(_use_ssl = nil)
-      @use_stage = _use_ssl if _use_ssl
-      @use_stage
+      @use_ssl = _use_ssl if _use_ssl
+      @use_ssl
     end
 
     def client_secret(secret = nil)
@@ -75,8 +71,8 @@ module WepayClient
     # this function will make a call to the /v2/oauth2/token endpoint to exchange a code for an access_token
     def get_access_token(auth_code, redirect_uri)
       json = post('/oauth2/token', nil, {'client_id' => client_id, 'client_secret' => client_secret, 'redirect_uri' => redirect_uri, 'code' => auth_code })
-      raise WepayClient::Exceptions::AccessTokenError.new("A problem occurred trying to get the access token: #{json.inspect}") unless json.has_key?(:access_token)
-      json[:access_token]
+      raise WepayClient::Exceptions::AccessTokenError.new("A problem occurred trying to get the access token: #{json.inspect}", json[:error_code]) unless json.has_key?(:access_token)
+      json
     end
 
     protected
@@ -110,9 +106,9 @@ module WepayClient
       if response.kind_of?(Net::HTTPSuccess)
         return json
       elsif response.code == 401
-        raise WepayClient::Exceptions::ExpiredTokenError.new("Token either expired, revoked or invalid: #{json.inspect}.")
+        raise WepayClient::Exceptions::ExpiredTokenError.new("Token either expired, revoked or invalid: #{json.inspect}.", json[:error_code])
       else
-        raise WepayClient::Exceptions::WepayApiError.new("The API request failed with error code ##{response.code}: #{json.inspect}.")
+        raise WepayClient::Exceptions::WepayApiError.new("The API request failed with error code ##{response.code}: #{json.inspect}.", json[:error_code])
       end
     end
 
@@ -129,9 +125,9 @@ module WepayClient
     def raise_if_response_error(json)
       if json.has_key?(:error) && json.has_key?(:error_description)
         if ['invalid code parameter','the code has expired','this access_token has been revoked', 'a valid access_token is required'].include?(json[:error_description])
-          raise WepayClient::Exceptions::ExpiredTokenError.new("Token either expired, revoked or invalid: #{json[:error_description]}")
+          raise WepayClient::Exceptions::ExpiredTokenError.new("Token either expired, revoked or invalid: #{json[:error_description]}", json[:error_code])
         else
-          raise WepayClient::Exceptions::WepayApiError.new(json[:error_description])
+          raise WepayClient::Exceptions::WepayApiError.new(json[:error_description], json[:error_code])
         end
       end
     end
