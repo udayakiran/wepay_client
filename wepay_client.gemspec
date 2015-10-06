@@ -13,9 +13,29 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "wepay_client"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = %w[
+    Gemfile
+    README
+    Rakefile
+    lib/wepay_client.rb
+    lib/wepay_client/account.rb
+    lib/wepay_client/base_error.rb
+    lib/wepay_client/checkout.rb
+    lib/wepay_client/client.rb
+    lib/wepay_client/exceptions.rb
+    lib/wepay_client/preapproval.rb
+    lib/wepay_client/version.rb
+    spec/client_spec.rb
+    spec/helpers/config_helper.rb
+    spec/helpers/mock_helper.rb
+    spec/helpers/wepay_response.rb
+    spec/spec_helper.rb
+    spec/wepay_response/access_token_success.json
+    spec/wepay_response/account_creation_success.json
+    wepay_client.gemspec
+  ]
+  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+  s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
   s.add_dependency 'json'
