@@ -1,5 +1,6 @@
 This is a simple ruby client to interact with wepay apis.
 
+Supports version 2014-01-08 (https://www.wepay.com/developer/version) 
 Usage
 
 In rails put following in Gemfile
