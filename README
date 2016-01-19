@@ -1,7 +1,8 @@
 This is a simple ruby client to interact with wepay apis.
 
-Supports version 2014-01-08 (https://www.wepay.com/developer/version) 
-Usage
+Supports version 2011-11-18 (https://www.wepay.com/developer/version), the latest version to the date.
+
+##Usage
 
 In rails put following in Gemfile
 gem 'wepay_client',:git => 'git://github.com/amitrawal/wepay_client.git'
