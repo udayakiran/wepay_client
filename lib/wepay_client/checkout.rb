@@ -11,7 +11,7 @@ module WepayClient
           :fee => { 
                     :app_fee => 0,
                     :fee_payer => 'Payee'
-                  }
+                  },
           :auto_capture => 1,
           :require_shipping => 0
       }.merge(params)
