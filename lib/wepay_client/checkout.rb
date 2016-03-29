@@ -7,13 +7,11 @@ module WepayClient
     def create_checkout(access_token, params = {})
       defaults = {
           :type => 'SERVICE',
-          :charge_tax => 0,
           :fee => { 
                     :app_fee => 0,
                     :fee_payer => 'Payee'
                   },
-          :auto_capture => 1,
-          :require_shipping => 0
+          :auto_capture => true
       }.merge(params)
       self.post("/checkout/create", access_token, defaults.merge(params))
     end
