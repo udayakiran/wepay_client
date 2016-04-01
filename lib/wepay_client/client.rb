@@ -84,7 +84,7 @@ module WepayClient
 
       # construct the call data and access token
       req = Net::HTTP.const_get(type.to_s.camelize).new(uri.request_uri, initheader = {'Content-Type' =>'application/json', 'User-Agent' => 'WePay Ruby SDK'})
-      req.add_field('Authorization: Bearer', access_token) if access_token
+      req.add_field('Authorization', 'Bearer ' + access_token) if access_token
       req.body = body.to_json if body
       http.request(req)
     end
